@@ -12,12 +12,10 @@ from telegram.ext.filters import Filters
 import requests
 from credentials import bot_token, bot_user_name,URL
 
-# bnbpvkkey=Q8YP1QDJBZ537SB47ECQGW7UPIAFE2VTZZ
-
 updater = Updater(bot_token,
 				use_context=True)
 
-j = updater.job_queue				
+jobqueue = updater.job_queue				
 
 
 def start(update: Update, context: CallbackContext):
@@ -66,7 +64,7 @@ updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filte
 # Filters out unknown messages.
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
 
-j.run_repeating(callback_30, 300)
+jobqueue.run_repeating(callback_30, 300)
 
 updater.start_polling()
 
@@ -79,3 +77,5 @@ updater.idle()
 # messages
 # buy sell check
 # hosting
+
+# taxes, liq, max buy/sell, wallet and mc
