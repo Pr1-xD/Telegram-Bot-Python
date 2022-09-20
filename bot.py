@@ -58,22 +58,26 @@ def liquidity(update, context):
     update.message.reply_text(quote.json()["data"]["items"][0]["total_liquidity_quote"])
 
 
-def getNewBuys(tokenaddress):
-	cnt=0
+def getNewBuys():
+	cnt=-1
 	newtxhash=''
 	txlist = requests.request(url='https://api.covalenthq.com/v1/1/xy=k/uniswap_v2/tokens/address/0x461b71cff4d4334bba09489ace4b5dc1a1813445/transactions/?quote-currency=USD&format=JSON&page-number=&page-size=&key=ckey_7e494e0bde414fd19967dfc3586',method='get')
-	while(txlist[0]!=txhash or cnt<10):
-		print(txlist[0])
-		cnt=cnt+1
-		newtxhash=txlist[0]
-	txhash=newtxhash
+	print(txlist.json()['data']['updated_at'])
+	while(cnt>-5):
+		print(txlist.json()['data']['items'][cnt]['tx_hash'])
+		cnt=cnt-1
+		newtxhash=txlist.json()['data']['items'][cnt]['tx_hash']
+	# txhash=newtxhash
 	
 def refreshtx(context: CallbackContext):
-    context.bot.send_message(chat_id=1345491631,text='New Buy/Sell')
+	print('60s')
+	getNewBuys()
+	context.bot.send_message(chat_id=1345491631,text='New Buy/Sell')
 
 def wbnb(update, context):
-    quote = requests.request(url='https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c&apikey=Q8YP1QDJBZ537SB47ECQGW7UPIAFE2VTZZ',method='get')
-    update.message.reply_text(quote.json()['status'])        
+	quote = requests.request(url='https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c&apikey=Q8YP1QDJBZ537SB47ECQGW7UPIAFE2VTZZ',method='get')
+	update.message.reply_text(quote.json()['status'])   
+	getNewBuys(txhash)     
 
 
 def checkcontext(update: Update, context: CallbackContext):
@@ -105,7 +109,7 @@ updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filte
 # Filters out unknown messages.
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
 
-jobqueue.run_repeating(callback_30, 300)
+jobqueue.run_repeating(refreshtx, 60)
 
 updater.start_polling()
 
