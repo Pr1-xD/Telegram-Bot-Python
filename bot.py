@@ -32,10 +32,7 @@ def start(update: Update, context: CallbackContext):
 
 def help(update: Update, context: CallbackContext):
 	update.message.reply_text("""Available Commands :-
-	/youtube - To get the youtube URL
-	/linkedin - To get the LinkedIn profile URL
-	/gmail - To get gmail URL
-	/geeks - To get the GeeksforGeeks URL""")
+	/motivate: get quotes""")
 
 
 #unknown handler function	
@@ -49,7 +46,7 @@ def unknown(update: Update, context: CallbackContext):
 
 def motivate(update, context):
     quote = requests.request(url='https://api.quotable.io/random',method='get')
-    update.message.reply_text(quote.json()['author'])
+    update.message.reply_text(quote.json()['content'])
 
 
 # returns token price for fixed token address	
@@ -80,15 +77,21 @@ def liquidity(update, context):
 # gets latest buys from txlist
 
 def getNewBuys():
+	global txhash
 	cnt=-1
-	newtxhash=''
+
 	txlist = requests.request(url='https://api.covalenthq.com/v1/1/xy=k/uniswap_v2/tokens/address/0x461b71cff4d4334bba09489ace4b5dc1a1813445/transactions/?quote-currency=USD&format=JSON&page-number=&page-size=&key=ckey_7e494e0bde414fd19967dfc3586',method='get')
-	print(txlist.json()['data']['updated_at'])
-	while(cnt>-5):
-		print(txlist.json()['data']['items'][cnt]['tx_hash'])
-		cnt=cnt-1
-		newtxhash=txlist.json()['data']['items'][cnt]['tx_hash']
-	# txhash=newtxhash
+	newtxhash=txlist.json()['data']['items'][cnt]['tx_hash']
+
+	print('last tx hash'+txhash)
+	print('new tx hash'+newtxhash)
+	
+	if(txhash!=newtxhash):
+		print(txlist.json()['data']['updated_at'])
+		while(txlist.json()['data']['items'][cnt]['tx_hash']!=txhash and cnt>-10):
+			print(txlist.json()['data']['items'][cnt]['tx_hash'])
+			cnt=cnt-1
+		txhash=newtxhash
 
 
 # repeating function 
@@ -142,9 +145,9 @@ updater.start_polling()
 updater.idle()
 
 
-# run repeat
+# run repeat ---------
 # add to group
-# api call
+# api call	
 # messages
 # buy sell check
 # hosting
